@@ -4,6 +4,7 @@ const router = express.Router();
 const db = require('../db');
 
 
+
 // Update user profile
 router.post('/update-profile', (req, res) => {
   const { mobile, username, email, owner_number, purchase_number, gst_numbers, addresses } = req.body;
@@ -42,7 +43,7 @@ module.exports = router;
 
 // Update company info
 router.post('/update-company', (req, res) => {
-  const { mobile, username, gst_number, pan_number, address, email } = req.body;
+  const { mobile, username, gst_number, pan_number, address, email, employee_number } = req.body;
 
   if (!mobile || !username || !gst_number || !email) {
     return res.status(400).json({ success: false, message: 'Missing required fields' });
@@ -54,11 +55,12 @@ router.post('/update-company', (req, res) => {
       gst_number = ?,
       pan_number = ?,
       address = ?,
-      email = ?
+      email = ?,
+      employee_number = ?
     WHERE mobile = ?
   `;
 
-  db.query(query, [username, gst_number, pan_number, address, email, mobile], (err, result) => {
+  db.query(query, [username, gst_number, pan_number, address, email, employee_number, mobile], (err, result) => {
     if (err) {
       console.error('DB Update Error:', err);
       return res.status(500).json({ success: false, message: 'Database error' });
@@ -93,6 +95,40 @@ router.post('/create-user', (req, res) => {
       return res.status(500).json({ success: false, message: 'Database error' });
     }
     res.json({ success: true, message: 'User saved' });
+  });
+});
+
+module.exports = router;
+
+// Check if user's company information exists
+router.post('/check-info', (req, res) => {
+  const { mobile } = req.body;
+
+  if (!mobile) {
+    return res.status(400).json({ success: false, message: 'Mobile number is required' });
+  }
+
+  const sql = 'CALL CheckCompanyInfo(?)';
+
+  db.query(sql, [mobile], (err, results) => {
+    if (err) {
+      console.error('Stored procedure error:', err);
+      return res.status(500).json({ success: false, message: 'Database error' });
+    }
+
+    const resultSet = results[0]; // Stored procedures return an array of result sets
+    if (!resultSet || resultSet.length === 0) {
+      return res.status(404).json({ success: true, hasCompanyInfo: false, message: 'User not found' });
+    }
+
+    const user = resultSet[0];
+    const hasCompanyInfo = Boolean(user.hasCompanyInfo);
+
+    return res.json({
+      success: true,
+      hasCompanyInfo,
+      user: hasCompanyInfo ? user : null
+    });
   });
 });
 

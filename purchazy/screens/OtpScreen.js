@@ -20,7 +20,7 @@ const OtpScreen = ({ navigation, route }) => {
     }
 
     try {
-      const response = await fetch('http://192.168.1.6:5050/api/auth/verify-otp', {
+      const response = await fetch('http://192.168.29.111:5050/api/auth/verify-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ mobile, otp }),
@@ -32,7 +32,7 @@ const OtpScreen = ({ navigation, route }) => {
       
         const data = JSON.parse(text); // Safely try to parse it
         if (data.success) {
-          navigation.navigate('Welcome');
+          navigation.navigate('Welcome', { mobile });
         } else {
           Alert.alert('Verification Failed', data.message || 'Invalid OTP');
         }
@@ -42,6 +42,7 @@ const OtpScreen = ({ navigation, route }) => {
       }
       
   };
+
 
   return (
     <View style={styles.container}>

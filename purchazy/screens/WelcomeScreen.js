@@ -1,17 +1,74 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { Ionicons } from '@expo/vector-icons';
 
-const WelcomeScreen = ({ navigation }) => {
+const WelcomeScreen = ({ navigation, route }) => {
+    const { mobile } = route.params || {};
     const [name, setName] = useState('');
     const [role, setRole] = useState('');
 
-    const handleGetStarted = () => {
-        if (role === 'md_owner') {
-            navigation.navigate('TeamHandle');
-        } else {
-            navigation.navigate('CompanyInformation');
+    useEffect(() => {
+        if (!mobile) {
+            console.log('WelcomeScreen: Mobile is missing, going back to SignIn');
+            navigation.replace('SignIn');
+        }
+    }, [mobile]);
+
+    const handleGetStarted = async () => {
+        if (!mobile) {
+            console.log('WelcomeScreen: Mobile missing in handleGetStarted');
+            Alert.alert('Error', 'Mobile number is missing. Please go back to sign in.');
+            return;
+        }
+
+        if (!role) {
+            Alert.alert('Error', 'Please select your role');
+            return;
+        }
+
+        if (!name) {
+            Alert.alert('Error', 'Please enter your name');
+            return;
+        }
+
+        try {
+            console.log('Creating user with data:', { mobile, username: name, role });
+            const response = await fetch('http://192.168.29.111:5050/api/user/create-user', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    mobile,
+                    username: name,
+                    role
+                }),
+            });
+
+            const data = await response.json();
+            console.log('Create user response:', data);
+
+            if (data.success) {
+                const navigationParams = { 
+                    mobile: mobile.toString(), // Ensure mobile is a string
+                    role: role.toString(),    // Ensure role is a string
+                    name: name.toString()     // Ensure name is a string
+                };
+                console.log('WelcomeScreen navigating with params:', navigationParams);
+
+                if (role === 'md_owner') {
+                    navigation.navigate('TeamHandle', navigationParams);
+                } else {
+                    navigation.navigate('CompanyInformation', navigationParams);
+                }
+            } else {
+                Alert.alert('Error', data.message || 'Failed to create user. Please try again.');
+            }
+        } catch (error) {
+            console.error('Create user error:', error);
+            Alert.alert(
+                'Server Error',
+                'Could not create user. Please check your internet connection and try again.'
+            );
         }
     };
 

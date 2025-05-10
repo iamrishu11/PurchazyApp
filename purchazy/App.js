@@ -100,6 +100,7 @@ export default function App() {
   <RootStack.Screen name="TeamHandle" component={TeamHandleScreen} options={{ presentation: 'modal' }} />
   <RootStack.Screen name="CompanyInformation" component={CompanyInformationScreen} options={{ presentation: 'modal' }} />
   <RootStack.Screen name="Subscription" component={SubscriptionScreen} options={{ presentation: 'modal' }} />
+  <RootStack.Screen name="TrustedSuppliersIntro" component={TrustedSuppliersIntro} options={{ presentation: 'modal' }} />
   <RootStack.Screen name="Main" component={MainTabs} />
 </RootStack.Navigator>
 

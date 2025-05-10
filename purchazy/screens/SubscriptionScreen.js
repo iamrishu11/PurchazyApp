@@ -7,7 +7,7 @@ const SubscriptionScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Subscribe</Text>
-      <TouchableOpacity style={styles.skip} onPress={() => navigation.navigate('TrustedSuppliersIntro')}>
+      <TouchableOpacity style={styles.skip} onPress={() => navigation.navigate('Main')}>
         <Text style={styles.skipText}>SKIP</Text>
       </TouchableOpacity>
 
@@ -63,7 +63,7 @@ export default SubscriptionScreen;
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, backgroundColor: '#fff', alignItems: 'center' },
   title: { fontSize: 22, fontWeight: 'bold', marginTop: 20 },
-  skip: { position: 'absolute', top: 20, right: 20 },
+  skip: { position: 'absolute', top: 40, right: 20 },
   skipText: { color: '#8e7fff', fontWeight: '600' },
   heading: { fontSize: 20, fontWeight: '600', textAlign: 'center', marginTop: 20 },
   subheading: { fontSize: 14, color: '#666', textAlign: 'center', marginVertical: 10 },

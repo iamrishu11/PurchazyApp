@@ -8,8 +8,9 @@ import {
   StyleSheet,
   Alert,
   ScrollView,
-  KeyboardAvoidingView,//scrollable
+  KeyboardAvoidingView,
   Platform,
+  SafeAreaView,
 } from 'react-native';
 
 const SignInScreen = ({ navigation }) => {
@@ -22,7 +23,7 @@ const SignInScreen = ({ navigation }) => {
     }
 
     try {
-      const response = await fetch('http://192.168.1.6:5050/api/auth/send-otp', {
+      const response = await fetch('http://192.168.29.111:5050/api/auth/send-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ mobile }),
@@ -50,50 +51,73 @@ const SignInScreen = ({ navigation }) => {
   };
 
   return (
-    <KeyboardAvoidingView //scrollable
-      style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={60}
-    >
-      <ScrollView
-        contentContainerStyle={styles.container}
-        keyboardShouldPersistTaps="handled"
+    <SafeAreaView style={styles.safeArea}>
+      <KeyboardAvoidingView
+        style={styles.keyboardView}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
       >
-        <View style={styles.top}>
-          <TouchableOpacity style={styles.backButton}>
-            <Text style={styles.backArrow}>←</Text>
-          </TouchableOpacity>
-          <Text style={styles.heading}>Sign-in/Sign up</Text>
-          <Image source={require('../assets/splash-icon.png')} style={styles.illustration} />
-        </View>
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          bounces={false}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.content}>
+            <View style={styles.top}>
+              <TouchableOpacity style={styles.backButton}>
+                <Text style={styles.backArrow}>←</Text>
+              </TouchableOpacity>
+              <Text style={styles.heading}>Sign-in/Sign up</Text>
+              <Image source={require('../assets/splash-icon.png')} style={styles.illustration} />
+            </View>
 
-        <Text style={styles.label}>Mobile Sign-in</Text>
-        <Text style={styles.description}>We will send you an SMS code for verification.</Text>
-        <Text style={styles.subLabel}>Enter your mobile number here</Text>
+            <Text style={styles.label}>Mobile Sign-in</Text>
+            <Text style={styles.description}>We will send you an SMS code for verification.</Text>
+            <Text style={styles.subLabel}>Enter your mobile number here</Text>
 
-        <TextInput
-          style={styles.input}
-          placeholder="+91-"
-          keyboardType="phone-pad"
-          value={mobile}
-          onChangeText={setMobile}
-        />
+            <TextInput
+              style={styles.input}
+              placeholder="+91-"
+              keyboardType="phone-pad"
+              value={mobile}
+              onChangeText={setMobile}
+            />
 
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
-          <Text style={styles.buttonText}>Login</Text>
-        </TouchableOpacity>
-      </ScrollView>
-    </KeyboardAvoidingView>
+            <TouchableOpacity style={styles.button} onPress={handleLogin}>
+              <Text style={styles.buttonText}>Login</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 
 export default SignInScreen;
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  keyboardView: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  scrollView: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  scrollContent: {
+    flexGrow: 1,
+    backgroundColor: '#fff',
+  },
+  content: {
+    flex: 1,
     padding: 20,
     backgroundColor: '#fff',
-    flexGrow: 1,
   },
   top: {
     alignItems: 'flex-start',

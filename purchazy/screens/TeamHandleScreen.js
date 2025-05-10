@@ -2,9 +2,12 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-const TeamHandleScreen = ({ navigation }) => {
+const TeamHandleScreen = ({ navigation, route }) => {
+    const { mobile, role, name } = route.params || {};
+
     const handleDone = () => {
-        navigation.navigate('CompanyInformation');
+        console.log('TeamHandleScreen navigating with params:', { mobile, role, name });
+        navigation.navigate('CompanyInformation', { mobile, role, name });
     };
 
     return (
