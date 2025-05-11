@@ -86,12 +86,6 @@ const CompanyInformationScreen = ({ navigation, route }) => {
       errors.push('Please enter a valid email address');
     }
 
-    if (!employeeNumber.trim()) {
-      errors.push('Employee Number is required');
-    } else if (!validateMobile(employeeNumber)) {
-      errors.push('Please enter a valid 10-digit employee number');
-    }
-
     if (errors.length > 0) {
       Alert.alert(
         'Validation Error',
@@ -227,7 +221,7 @@ const CompanyInformationScreen = ({ navigation, route }) => {
               style={styles.input}
               value={employeeNumber}
               onChangeText={setEmployeeNumber}
-              placeholder="Enter 10-digit mobile number"
+              placeholder="Enter Number of Employee"
               keyboardType="phone-pad"
               maxLength={10}
             />

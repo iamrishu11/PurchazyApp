@@ -104,6 +104,7 @@ const WelcomeScreen = ({ navigation, route }) => {
                 >
                     <Picker.Item label="Select an option" value="" />
                     <Picker.Item label="I am MD/Company owner & I myself will manage purchase." value="md_owner" />
+                    <Picker.Item label="I am MD/Company owner & My team manages purchase." value="md_team" />
                     <Picker.Item label="I am from the purchase team." value="purchase_team" />
                 </Picker>
             </View>
