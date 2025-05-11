@@ -20,29 +20,50 @@ const OtpScreen = ({ navigation, route }) => {
     }
 
     try {
-      const response = await fetch('http://192.168.29.111:5050/api/auth/verify-otp', {
+      // First verify OTP with backend
+      const otpResponse = await fetch('http://192.168.29.111:5050/api/auth/verify-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ mobile, otp }),
       });
-      
-      
-        const text = await response.text();
-        console.log('Raw response from /verify-otp:', text);
-      
-        const data = JSON.parse(text); // Safely try to parse it
-        if (data.success) {
-          navigation.navigate('Welcome', { mobile });
-        } else {
-          Alert.alert('Verification Failed', data.message || 'Invalid OTP');
-        }
-      } catch (err) {
-        console.error('OTP verification error:', err);
-        Alert.alert('Error', 'Could not verify OTP. Please try again.');
-      }
-      
-  };
 
+      const otpText = await otpResponse.text();
+      console.log('Raw response from /verify-otp:', otpText);
+      const otpData = JSON.parse(otpText);
+
+      if (!otpData.success) {
+        Alert.alert('Verification Failed', otpData.message || 'Invalid OTP');
+        return;
+      }
+
+      // OTP verification passed, now check if user exists in the database
+      const checkUserResponse = await fetch('http://192.168.29.111:5050/api/user/check-info', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mobile }),
+      });
+
+      const userText = await checkUserResponse.text();
+      console.log('Raw response from /check-info:', userText);
+      const userData = JSON.parse(userText);
+
+      if (userData.success) {
+        // If user exists, navigate to the main screen
+        if (userData.hasCompanyInfo) {
+          navigation.navigate('Main');  // Assuming 'Main' is the screen you want to redirect to
+        } else {
+          // If no company info, navigate to the welcome screen
+          navigation.navigate('Welcome', { mobile });
+        }
+      } else {
+        // If mobile number is not found
+        Alert.alert('User Not Found', 'The provided mobile number is not registered.');
+      }
+    } catch (err) {
+      console.error('Error during OTP verification or user check:', err);
+      Alert.alert('Error', 'An error occurred. Please try again later.');
+    }
+  };
 
   return (
     <View style={styles.container}>

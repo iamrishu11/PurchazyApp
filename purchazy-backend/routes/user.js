@@ -38,7 +38,7 @@ router.post('/update-profile', (req, res) => {
   );
 });
 
-module.exports = router;
+// module.exports = router;
 
 
 // Update company info
@@ -74,7 +74,7 @@ router.post('/update-company', (req, res) => {
   });
 });
 
-module.exports = router;
+// module.exports = router;
 
 router.post('/create-user', (req, res) => {
   const { mobile, username, role } = req.body;
@@ -98,9 +98,7 @@ router.post('/create-user', (req, res) => {
   });
 });
 
-module.exports = router;
 
-// Check if user's company information exists
 router.post('/check-info', (req, res) => {
   const { mobile } = req.body;
 
@@ -118,7 +116,7 @@ router.post('/check-info', (req, res) => {
 
     const resultSet = results[0]; // Stored procedures return an array of result sets
     if (!resultSet || resultSet.length === 0) {
-      return res.status(404).json({ success: true, hasCompanyInfo: false, message: 'User not found' });
+      return res.status(404).json({ success: false, message: 'User not found' });
     }
 
     const user = resultSet[0];
@@ -131,5 +129,6 @@ router.post('/check-info', (req, res) => {
     });
   });
 });
+
 
 module.exports = router;
