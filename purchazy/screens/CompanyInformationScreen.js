@@ -48,7 +48,7 @@ const CompanyInformationScreen = ({ navigation, route }) => {
     if (!mobile) missingParams.push('Mobile Number');
     if (!role) missingParams.push('Role');
     if (!name) missingParams.push('Name');
-
+  
     if (missingParams.length > 0) {
       Alert.alert(
         'Missing Information',
@@ -56,36 +56,36 @@ const CompanyInformationScreen = ({ navigation, route }) => {
       );
       return;
     }
-
+  
     // Validate all form fields
     const errors = [];
     
     if (!companyName.trim()) {
       errors.push('Company Name is required');
     }
-
+  
     if (!gstNumber.trim()) {
       errors.push('GST Number is required');
     } else if (!validateGST(gstNumber)) {
       errors.push('Please enter a valid GST Number');
     }
-
+  
     if (!panNumber.trim()) {
       errors.push('PAN Number is required');
     } else if (!validatePAN(panNumber)) {
       errors.push('Please enter a valid PAN Number');
     }
-
+  
     if (!address.trim()) {
       errors.push('Address is required');
     }
-
+  
     if (!email.trim()) {
       errors.push('Email is required');
     } else if (!validateEmail(email)) {
       errors.push('Please enter a valid email address');
     }
-
+  
     if (errors.length > 0) {
       Alert.alert(
         'Validation Error',
@@ -93,7 +93,7 @@ const CompanyInformationScreen = ({ navigation, route }) => {
       );
       return;
     }
-
+  
     try {
       console.log('Form data before submission:', {
         mobile,
@@ -105,14 +105,14 @@ const CompanyInformationScreen = ({ navigation, route }) => {
         email,
         employee_number: employeeNumber
       });
-
+  
       const response = await fetch('http://192.168.29.111:5050/api/user/update-company', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           mobile,
           role,
-          username: companyName,
+          company_name: companyName,
           gst_number: gstNumber,
           pan_number: panNumber,
           address,
@@ -120,17 +120,25 @@ const CompanyInformationScreen = ({ navigation, route }) => {
           employee_number: employeeNumber
         }),
       });
-
+  
       const data = await response.json();
       console.log('Server response:', data);
-
+  
       if (data.success) {
         navigation.navigate('Main');
       } else {
-        Alert.alert(
-          'Error',
-          data.message || 'Failed to save company info. Please check all fields and try again.'
-        );
+        // Check if the error is related to duplicate email
+        if (data.message && data.message.includes('email')) {
+          Alert.alert(
+            'Duplicate Email',
+            data.message || 'The email address is already in use. Please use a different email.'
+          );
+        } else {
+          Alert.alert(
+            'Error',
+            data.message || 'Failed to save company info. Please check all fields and try again.'
+          );
+        }
       }
     } catch (error) {
       console.error('Company Info Error:', error);
@@ -140,6 +148,7 @@ const CompanyInformationScreen = ({ navigation, route }) => {
       );
     }
   };
+  
 
   return (
     <SafeAreaView style={styles.safeArea}>

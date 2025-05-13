@@ -18,52 +18,67 @@ const OtpScreen = ({ navigation, route }) => {
       Alert.alert('Invalid OTP', 'Please enter the 6-digit OTP.');
       return;
     }
-
+  
     try {
-      // First verify OTP with backend
+      // Verify OTP with backend
       const otpResponse = await fetch('http://192.168.29.111:5050/api/auth/verify-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ mobile, otp }),
       });
-
+  
       const otpText = await otpResponse.text();
       console.log('Raw response from /verify-otp:', otpText);
       const otpData = JSON.parse(otpText);
-
+  
       if (!otpData.success) {
         Alert.alert('Verification Failed', otpData.message || 'Invalid OTP');
         return;
       }
-
-      // OTP verification passed, now check if user exists in the database
+  
+      // OTP verified, now check user existence
       const checkUserResponse = await fetch('http://192.168.29.111:5050/api/user/check-info', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ mobile }),
       });
-
+  
       const userText = await checkUserResponse.text();
       console.log('Raw response from /check-info:', userText);
       const userData = JSON.parse(userText);
-
+  
+      // Check if user is empty
+      const user = userData.user || {};
+      if (Object.keys(user).length === 0) {
+        console.log('User not found. Navigating to Welcome');
+        navigation.navigate('Welcome', { mobile });
+        return;
+      }
+  
+      // Extract role and name from user object
+      const role = user.description || '';  // Ensure role is properly extracted
+      const name = user.username || '';    // Ensure name is properly extracted
+  
       if (userData.success) {
-        // If user exists, navigate to the main screen
         if (userData.hasCompanyInfo) {
-          navigation.navigate('Main');  // Assuming 'Main' is the screen you want to redirect to
+          console.log('Navigating to Main');
+          navigation.navigate('Main');
         } else {
-          // If no company info, navigate to the welcome screen
-          navigation.navigate('Welcome', { mobile });
+          console.log('Navigating to CompanyInformation with:', { mobile, role, name });
+          navigation.navigate('CompanyInformation', { mobile, role, name });
         }
       } else {
-        // If mobile number is not found
-        Alert.alert('User Not Found', 'The provided mobile number is not registered.');
+        console.log('Navigating to Welcome with:', { mobile });
+        navigation.navigate('Welcome', { mobile });
       }
     } catch (err) {
       console.error('Error during OTP verification or user check:', err);
       Alert.alert('Error', 'An error occurred. Please try again later.');
     }
   };
+  
+  
+  
 
   return (
     <View style={styles.container}>
