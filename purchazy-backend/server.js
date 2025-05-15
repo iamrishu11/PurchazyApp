@@ -8,6 +8,8 @@ app.use(express.json());
 // ✅ Register both route files
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/user', require('./routes/user'));
+app.use('/api/rfqs', require('./routes/rfqs'));
+
 
 const PORT = 5050;
 const HOST = '0.0.0.0';

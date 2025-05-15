@@ -223,6 +223,7 @@ router.post('/check-info', (req, res) => {
 
     // Prepare response data
     const responseUser = {
+      id: user.id,
       mobile: user.mobile,            // Include mobile
       username: user.username,        // Include username
       description: user.role,         // Use the alias 'role' for 'description'
@@ -236,6 +237,36 @@ router.post('/check-info', (req, res) => {
   });
 });
 
+router.post('/get-user-rfqs', (req, res) => {
+  const { userId } = req.body;
+
+  if (!userId) {
+    return res.status(400).json({ success: false, message: 'User ID is required' });
+  }
+
+  const sql = `
+    SELECT rfqs.*
+    FROM rfqs
+    JOIN users ON rfqs.OWNER = users.id
+    WHERE users.id = ?
+  `;
+
+  db.query(sql, [userId], (err, results) => {
+    if (err) {
+      console.error('Error fetching RFQs:', err);
+      return res.status(500).json({ success: false, message: 'Database error' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ success: false, message: 'No RFQs found for this user' });
+    }
+
+    return res.json({
+      success: true,
+      rfqs: results,
+    });
+  });
+});
 
 
 

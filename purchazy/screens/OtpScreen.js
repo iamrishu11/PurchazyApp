@@ -20,7 +20,7 @@ const OtpScreen = ({ navigation, route }) => {
     }
   
     try {
-      // Verify OTP with backend
+      // Step 1: Verify OTP with backend
       const otpResponse = await fetch('http://192.168.29.111:5050/api/auth/verify-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -36,7 +36,7 @@ const OtpScreen = ({ navigation, route }) => {
         return;
       }
   
-      // OTP verified, now check user existence
+      // Step 2: Check if user exists
       const checkUserResponse = await fetch('http://192.168.29.111:5050/api/user/check-info', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -47,22 +47,23 @@ const OtpScreen = ({ navigation, route }) => {
       console.log('Raw response from /check-info:', userText);
       const userData = JSON.parse(userText);
   
-      // Check if user is empty
+      // Step 3: Extract user info safely
       const user = userData.user || {};
+      const role = user.description || '';
+      const name = user.username || '';
+      const id = user.id || ''; // ✅ Extract the ID here
+  
       if (Object.keys(user).length === 0) {
         console.log('User not found. Navigating to Welcome');
         navigation.navigate('Welcome', { mobile });
         return;
       }
   
-      // Extract role and name from user object
-      const role = user.description || '';  // Ensure role is properly extracted
-      const name = user.username || '';    // Ensure name is properly extracted
-  
+      // Step 4: Navigate accordingly
       if (userData.success) {
         if (userData.hasCompanyInfo) {
-          console.log('Navigating to Main');
-          navigation.navigate('Main');
+          console.log('Navigating to Main with:', { mobile, role, name, id });
+          navigation.navigate('Main', { mobile, role, name, id }); // ✅ Now id is defined
         } else {
           console.log('Navigating to CompanyInformation with:', { mobile, role, name });
           navigation.navigate('CompanyInformation', { mobile, role, name });
@@ -76,6 +77,7 @@ const OtpScreen = ({ navigation, route }) => {
       Alert.alert('Error', 'An error occurred. Please try again later.');
     }
   };
+  
   
   
   

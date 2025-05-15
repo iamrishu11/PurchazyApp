@@ -25,6 +25,8 @@ import AddBidScreen from './screens/AddBidScreen';
 import LiveBidScreen from './screens/LiveBidScreen';
 import ClosedBidScreen from './screens/ClosedBidScreen';
 import SelectSuppliersScreen from './screens/SelectSuppliersScreen';
+import BidDetailScreen from './screens/BidDetailScreen';
+
 
 // Suppliers Stack: only Intro and List
 const SupplierStack = createStackNavigator();
@@ -52,21 +54,31 @@ function AccountScreen() {
 
 // Bids Stack remains same
 const BidsStack = createStackNavigator();
-function BidsTabStack() {
+function BidsTabStack({ route }) {
+  const { id, mobile, role, name } = route.params || {};
+
   return (
     <BidsStack.Navigator screenOptions={{ headerShown: false }}>
-      <BidsStack.Screen name="BidsList" component={BidsScreen} />
+      <BidsStack.Screen
+        name="BidsList"
+        component={BidsScreen}
+        initialParams={{ id, mobile, role, name }}
+      />
       <BidsStack.Screen name="AddBid" component={AddBidScreen} />
       <BidsStack.Screen name="LiveBid" component={LiveBidScreen} />
       <BidsStack.Screen name="ClosedBid" component={ClosedBidScreen} />
       <BidsStack.Screen name="SelectSuppliers" component={SelectSuppliersScreen} />
+      <BidsStack.Screen name="BidDetail" component={BidDetailScreen} />
     </BidsStack.Navigator>
   );
 }
 
+
 // Main Bottom Tabs — No Orders
 const Tab = createBottomTabNavigator();
-function MainTabs() {
+function MainTabs({ route }) {
+  const { mobile, role, name, id } = route.params;
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -80,12 +92,25 @@ function MainTabs() {
         },
       })}
     >
-      <Tab.Screen name="Bids" component={BidsTabStack} />
-      <Tab.Screen name="Suppliers" component={SuppliersScreen} />
-      <Tab.Screen name="Account" component={AccountScreen} />
+      <Tab.Screen
+        name="Bids"
+        component={BidsTabStack}
+        initialParams={{ mobile, role, name, id }}
+      />
+      <Tab.Screen
+        name="Suppliers"
+        component={SuppliersScreen}
+        initialParams={{ mobile, role, name, id }}
+      />
+      <Tab.Screen
+        name="Account"
+        component={AccountScreen}
+        initialParams={{ mobile, role, name, id }}
+      />
     </Tab.Navigator>
   );
 }
+
 
 // Root Navigator
 const RootStack = createStackNavigator();
